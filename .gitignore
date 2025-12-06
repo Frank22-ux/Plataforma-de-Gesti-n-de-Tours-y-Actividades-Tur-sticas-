@@ -1,0 +1,12 @@
+# Archivo de variables de entorno
+.env
+
+# Directorio de dependencias de Node
+node_modules/
+
+# Directorio de build/distribución
+dist/
+
+# Otros archivos comunes a ignorar en proyectos Node/Web
+npm-debug.log*
+yarn-error.log*
