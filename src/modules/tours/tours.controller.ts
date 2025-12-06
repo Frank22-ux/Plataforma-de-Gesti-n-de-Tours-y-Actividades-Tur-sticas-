@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseFloatPipe} from '@nestjs/common';
+import { 
+  Controller, 
+  Get, 
+  Post, 
+  Body, 
+  Patch, 
+  Param, 
+  Delete, 
+  Query, 
+  ParseFloatPipe,
+  UseInterceptors
+} from '@nestjs/common';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { ToursService } from './tours.service';
 import { CreateTourDto } from './dto/create-tour.dto';
 import { UpdateTourDto } from './dto/update-tour.dto';
@@ -12,6 +24,9 @@ export class ToursController {
     return this.toursService.create(createTourDto);
   }
 
+  // --- OPTIMIZACIÓN CON REDIS ---
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(30) // Guarda en caché por 30 segundos
   @Get('nearby')
   findNearby(
     @Query('lat', ParseFloatPipe) lat: number,
@@ -25,19 +40,21 @@ export class ToursController {
   findAll() {
     return this.toursService.findAll();
   }
-
+  
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.toursService.findOne(+id);
+    return this.toursService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTourDto: UpdateTourDto) {
-    return this.toursService.update(+id, updateTourDto);
+    // CORREGIDO: Se quitó el '+' antes de id
+    return this.toursService.update(id, updateTourDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.toursService.remove(+id);
+    // CORREGIDO: Se quitó el '+' antes de id
+    return this.toursService.remove(id);
   }
 }
