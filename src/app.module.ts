@@ -5,6 +5,7 @@ import { CacheModule } from '@nestjs/cache-manager'; // <--- NUEVO
 import * as redisStore from 'cache-manager-ioredis'; // <--- NUEVO (El driver)
 import * as Joi from 'joi';
 import { ToursModule } from './modules/tours/tours.module';
+import { PricingModule } from './modules/pricing/pricing.module';
 
 @Module({
   imports: [
@@ -52,6 +53,8 @@ import { ToursModule } from './modules/tours/tours.module';
     }),
 
     ToursModule,
+
+    PricingModule,
   ],
 })
 export class AppModule {}

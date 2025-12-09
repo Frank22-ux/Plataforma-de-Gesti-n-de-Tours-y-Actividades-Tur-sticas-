@@ -1,10 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common'; // <--- Agregado NotFoundException
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import type { Cache } from 'cache-manager'; // Seguimos usando 'import type'
-import { CreateTourDto } from './dto/create-tour.dto';
-import { UpdateTourDto } from './dto/update-tour.dto';
+import type { Cache } from 'cache-manager';
+import { CreateTourDto } from '../pricing/dto/create-tour.dto'; // <--- CORREGIDO: Apunta a la carpeta local ./dto
+import { UpdateTourDto } from '../pricing/dto/update-tour.dto'; // <--- CORREGIDO: Apunta a la carpeta local ./dto
 import { Tour } from './entities/tour.entity';
 
 @Injectable()
@@ -16,33 +16,32 @@ export class ToursService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  // --- HELPER PARA LIMPIAR CACHÉ (CORREGIDO) ---
+  // --- HELPER PARA LIMPIAR CACHÉ ---
   private async clearCache() {
-    // TRUCO TÉCNICO: Convertimos 'cacheManager' a 'any' PRIMERO.
-    // Así TypeScript deja de buscar la propiedad 'store' en la interfaz estricta.
     const manager = this.cacheManager as any;
     const store = manager.store;
 
     if (store && store.reset) {
-      await store.reset(); // Intento 1: Reset directo
+      await store.reset();
     } else if (store && store.keys && store.del) {
-      // Intento 2: Borrado manual por llaves (Fallback para Redis)
       const keys = await store.keys('*');
       if (keys.length > 0) {
         await store.del(keys);
       }
     } else if (manager.reset) {
-        await manager.reset(); // Intento 3: Reset en el manager
+        await manager.reset();
     }
   }
 
+  // --- CREAR (REAL) ---
   async create(createTourDto: CreateTourDto) {
-    await this.clearCache(); // Limpiamos caché antes de guardar
+    await this.clearCache(); // Limpiar caché
     
     const tour = this.tourRepository.create(createTourDto);
     return await this.tourRepository.save(tour);
   }
 
+  // --- BUSCAR CERCANOS (REAL) ---
   async findNearby(lat: number, lon: number, radiusInKm: number) {
     const radiusInMeters = radiusInKm * 1000;
 
@@ -78,13 +77,36 @@ export class ToursService {
     return this.tourRepository.findOneBy({ id });
   }
 
+  // --- ACTUALIZAR (REAL - AHORA SÍ GUARDA EN DB) ---
   async update(id: string, updateTourDto: UpdateTourDto) {
-    await this.clearCache(); // Limpiamos caché al editar
-    return `This action updates a #${id} tour`;
+    await this.clearCache(); // 1. Limpiamos memoria
+
+    // 2. 'preload' busca el ID y le "parchea" los datos nuevos
+    const tour = await this.tourRepository.preload({
+      id: id,
+      ...updateTourDto,
+    });
+
+    if (!tour) {
+      throw new NotFoundException(`Tour con ID ${id} no encontrado`);
+    }
+
+    // 3. Guardamos los cambios
+    return await this.tourRepository.save(tour);
   }
 
+  // --- ELIMINAR (REAL - AHORA SÍ BORRA DE LA DB) ---
   async remove(id: string) {
-    await this.clearCache(); // Limpiamos caché al borrar
-    return `This action removes a #${id} tour`;
+    await this.clearCache(); // 1. Limpiamos memoria
+
+    // 2. Buscamos el tour primero para ver si existe
+    const tour = await this.findOne(id); 
+    
+    if (!tour) {
+      throw new NotFoundException(`Tour con ID ${id} no encontrado`);
+    }
+
+    // 3. Lo eliminamos físicamente
+    return await this.tourRepository.remove(tour);
   }
 }

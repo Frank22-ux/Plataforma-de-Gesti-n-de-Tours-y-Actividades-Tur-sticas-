@@ -12,8 +12,8 @@ import {
 } from '@nestjs/common';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { ToursService } from './tours.service';
-import { CreateTourDto } from './dto/create-tour.dto';
-import { UpdateTourDto } from './dto/update-tour.dto';
+import { CreateTourDto } from '../pricing/dto/create-tour.dto';
+import { UpdateTourDto } from '../pricing/dto/update-tour.dto';
 
 @Controller('tours')
 export class ToursController {
