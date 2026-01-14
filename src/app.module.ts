@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CacheModule } from '@nestjs/cache-manager';
+import { ScheduleModule } from '@nestjs/schedule'; 
 import * as redisStore from 'cache-manager-ioredis';
 import * as Joi from 'joi';
 
@@ -9,7 +10,8 @@ import * as Joi from 'joi';
 import { ToursModule } from './modules/tours/tours.module';
 import { PricingModule } from './modules/pricing/pricing.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { BookingsModule } from './modules/bookings/bookings.module'; // <--- 1. IMPORTAR ESTO
+import { BookingsModule } from './modules/bookings/bookings.module';
+import { UsersModule } from './modules/users/users.module'; // <--- 1. IMPORTAR ESTO
 
 @Module({
   imports: [
@@ -28,7 +30,10 @@ import { BookingsModule } from './modules/bookings/bookings.module'; // <--- 1. 
       }),
     }),
 
-    // 2. Configuración de Redis
+    // 2. Activamos el motor de tareas programadas (Cron)
+    ScheduleModule.forRoot(),
+
+    // 3. Configuración de Redis
     CacheModule.registerAsync({
       isGlobal: true,
       imports: [ConfigModule],
@@ -41,7 +46,7 @@ import { BookingsModule } from './modules/bookings/bookings.module'; // <--- 1. 
       }),
     }),
 
-    // 3. Base de Datos
+    // 4. Base de Datos
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -61,7 +66,8 @@ import { BookingsModule } from './modules/bookings/bookings.module'; // <--- 1. 
     ToursModule,
     PricingModule,
     AuthModule,
-    BookingsModule, // <--- 2. AGREGAR AQUÍ
+    BookingsModule,
+    UsersModule, // <--- 2. AGREGAR AQUÍ
   ],
 })
 export class AppModule {}

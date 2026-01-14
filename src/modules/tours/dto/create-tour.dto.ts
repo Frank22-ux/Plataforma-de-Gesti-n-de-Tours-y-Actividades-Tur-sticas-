@@ -1,4 +1,5 @@
-import { IsString, IsNumber, IsNotEmpty, IsObject, Min, IsOptional } from 'class-validator';
+import { IsString, IsNumber, IsNotEmpty, IsObject, Min, IsOptional, IsBoolean, IsArray } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateTourDto {
   @IsString()
@@ -9,22 +10,50 @@ export class CreateTourDto {
   @IsNotEmpty()
   description: string;
 
-  // El precio suele llegar como string desde el FormData, pero idealmente lo transformamos antes.
-  // Si usas ValidationPipe con transform: true, intentará convertirlo.
   @IsNumber()
   @Min(0)
   price: number;
 
-  // --- NUEVA VALIDACIÓN: CATEGORÍA ---
   @IsString()
   @IsOptional()
   category?: string;
 
-  // --- NUEVA VALIDACIÓN: STOCK ---
-  // Usamos 'any' o 'string | number' para evitar errores de validación 
-  // cuando el FormData envía el número como texto "10".
   @IsOptional()
-  stock?: any;
+  stock?: any; // Recibe string del form, se convierte en controller
+
+  // --- NUEVOS CAMPOS ---
+  @IsOptional()
+  startDate?: string;
+
+  @IsOptional()
+  endDate?: string;
+
+  @IsOptional()
+  guideIds?: any; // Puede venir como JSON string o array
+
+  @IsOptional()
+  isAdultOnly?: any; // String "true"/"false" del form
+
+  @IsOptional()
+  hasLodging?: any;
+
+  @IsOptional()
+  lodgingDays?: any;
+
+  @IsOptional()
+  lodgingNights?: any;
+
+  @IsOptional()
+  lodgingRooms?: any;
+
+  @IsOptional()
+  hasTransport?: any;
+
+  @IsOptional()
+  transportType?: string;
+
+  @IsOptional()
+  hasFood?: any;
 
   @IsObject()
   @IsNotEmpty()
