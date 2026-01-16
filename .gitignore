@@ -1,9 +1,19 @@
-# compiled output
-/dist
+# --- Dependencias y Salidas de Compilación ---
 /node_modules
+/dist
 /build
+/temp
+/.temp
+/.tmp
 
-# Logs
+# --- Variables de Entorno (Seguridad) ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# --- Logs y Reportes ---
 logs
 *.log
 npm-debug.log*
@@ -11,15 +21,16 @@ pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
-
-# OS
-.DS_Store
-
-# Tests
 /coverage
 /.nyc_output
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
-# IDEs and editors
+# --- Configuración de Editores (IDE) ---
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 /.idea
 .project
 .classpath
@@ -28,29 +39,12 @@ lerna-debug.log*
 .settings/
 *.sublime-workspace
 
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# --- Archivos del Sistema Operativo ---
+.DS_Store
+Thumbs.db
 
-# dotenv environment variable files
-.env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
-
-# temp directory
-.temp
-.tmp
-
-# Runtime data
+# --- Datos de Ejecución ---
 pids
 *.pid
 *.seed
 *.pid.lock
-
-# Diagnostic reports (https://nodejs.org/api/report.html)
-report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
