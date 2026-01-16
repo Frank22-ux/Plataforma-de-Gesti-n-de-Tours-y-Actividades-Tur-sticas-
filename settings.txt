@@ -1,0 +1,6 @@
+Para clonar la rama especifica
+cmd: git clone -b "Nombre de la rama" link_rama
+
+creamos las dependencias necesarias para el funcionamiento de docker
+cmd: docker compose up --build
+esto instala los espacios necesarios en docker, permitimos la pantalla
