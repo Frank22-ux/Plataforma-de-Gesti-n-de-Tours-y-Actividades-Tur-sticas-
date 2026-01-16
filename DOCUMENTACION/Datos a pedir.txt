@@ -1,0 +1,5 @@
+MODELO RELACONAL
+DIAGRAMA DE CASOS DE USO
+DIAGRAMA DE PROCESOS
+
+Tener claro la función completa de los roles dentro
